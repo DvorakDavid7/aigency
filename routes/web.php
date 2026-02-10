@@ -11,7 +11,7 @@ Route::get('/auth/redirect', function () {
     $facebook = Socialite::driver('facebook');
 
     return $facebook
-        ->scopes(['ads_management', 'ads_read'])
+        ->scopes(['ads_management', 'ads_read', 'read_insights'])
         ->redirect();
 });
 
