@@ -7,14 +7,20 @@ use Inertia\Inertia;
 use Laravel\Socialite\Socialite;
 
 Route::get('/auth/redirect', function () {
-    return Socialite::driver('facebook')
+    /** @var \Laravel\Socialite\Two\FacebookProvider $facebook */
+    $facebook = Socialite::driver('facebook');
+
+    return $facebook
+        ->scopes(['ads_management', 'ads_read'])
         ->redirect();
 });
 
 Route::get('/auth/callback', function () {
-    $user = Socialite::driver('facebook')->user();
+    /** @var \Laravel\Socialite\Two\FacebookProvider $facebook */
+    $facebook = Socialite::driver('facebook');
 
-    // $user->token
+    $user = $facebook->user();
+    dd($user);
 });
 
 Route::get('/', function () {
