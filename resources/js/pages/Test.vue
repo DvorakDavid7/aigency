@@ -1,12 +1,7 @@
-<script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-
-</script>
-
 <template>
     <div>
-        <Link :href="`/auth/redirect`">
+        <a href="/auth/redirect">
             connect facebook
-        </Link>
+        </a>
     </div>
 </template>
