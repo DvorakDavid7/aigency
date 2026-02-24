@@ -9,7 +9,7 @@ export default function SignOutButton() {
 
   async function handleSignOut() {
     await authClient.signOut()
-    router.push("/signin")
+    router.push("/login")
   }
 
   return (

@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   })
 
   if (!session) {
-    redirect("/signin")
+    redirect("/login")
   }
 
   return (

@@ -119,7 +119,7 @@ export default function SignUpPage() {
 
           <p className="text-muted-foreground text-center text-sm">
             Already have an account?{" "}
-            <Link href="/signin" className="text-foreground underline underline-offset-4">
+            <Link href="/login" className="text-foreground underline underline-offset-4">
               Sign in
             </Link>
           </p>

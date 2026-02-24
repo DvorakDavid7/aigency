@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request)
 
   if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/signin", request.url))
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   return NextResponse.next()
