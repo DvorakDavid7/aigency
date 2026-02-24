@@ -1,9 +1,17 @@
+import Navbar from "@/components/landing/navbar"
+import HeroSection from "@/components/landing/hero-section"
+import PricingSection from "@/components/landing/pricing-section"
+import Footer from "@/components/landing/footer"
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-      <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">
-        Welcome to Aigency
-      </h1>
-    </main>
-  );
+    <div className="flex min-h-screen flex-col bg-background">
+      <Navbar />
+      <main className="flex-1">
+        <HeroSection />
+        <PricingSection />
+      </main>
+      <Footer />
+    </div>
+  )
 }
