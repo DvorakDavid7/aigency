@@ -15,7 +15,7 @@ const sqliteAdapter = new PrismaBetterSqlite3({
 })
 
 const prisma = globalForPrisma.prisma || new PrismaClient({
-  adapter: sqliteAdapter,
+  adapter: pgAdapter,
 })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
