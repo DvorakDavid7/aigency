@@ -8,5 +8,11 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-  }
+  },
+  socialProviders: {
+    facebook: {
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+    },
+  },
 });
