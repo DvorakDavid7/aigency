@@ -20,7 +20,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -29,7 +28,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { NavUser } from "./nav-user"
 
 type NavItem = { title: string; url: string; icon: LucideIcon }
 
@@ -55,11 +53,7 @@ function projectNav(id: string): NavItem[] {
   ]
 }
 
-type Props = {
-  user: { name: string; email: string; image?: string | null }
-}
-
-export function AppSidebar({ user }: Props) {
+export function AppSidebar() {
   const pathname = usePathname()
 
   const projectMatch = pathname.match(/^\/dashboard\/projects\/([^/]+)/)
@@ -123,10 +117,6 @@ export function AppSidebar({ user }: Props) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter>
-        <NavUser user={user} />
-      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>
