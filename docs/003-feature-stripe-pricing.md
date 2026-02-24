@@ -73,11 +73,11 @@ User clicks "Buy" → POST /api/credits/checkout
 ```
 
 ## Task Breakdown
-- [ ] Install `@better-auth/stripe` and `stripe` packages; add env vars to `.env` and `.env.example`
-- [ ] Add `stripeCustomerId` and `credits` fields to Prisma `User` model and run migration
-- [ ] Configure `@better-auth/stripe` plugin in `lib/auth.ts` (customer sync + `onEvent` credits webhook)
-- [ ] Add `stripeClient` plugin to `lib/auth-client.ts`
-- [ ] Run `npx @better-auth/cli generate` and `npm run db:migrate` to apply all schema changes
-- [ ] Define credit packages in `lib/stripe-packages.ts` and create Stripe products/prices in dashboard
-- [ ] Build `app/api/credits/checkout/route.ts` POST handler to create Checkout sessions
-- [ ] Build `app/dashboard/credits/page.tsx` with balance display and package cards
+- [x] Install `@better-auth/stripe` and `stripe` packages; add env vars to `.env` and `.env.example`
+- [x] Add `stripeCustomerId` and `credits` fields to Prisma `User` model and run migration
+- [x] Configure `@better-auth/stripe` plugin in `lib/auth.ts` (customer sync + `onEvent` credits webhook)
+- [x] Add `stripeClient` plugin to `lib/auth-client.ts`
+- [x] Run `npx @better-auth/cli generate` and `npm run db:migrate` to apply all schema changes
+- [x] Define credit packages in `lib/stripe-packages.ts` and create Stripe products/prices in dashboard
+- [x] Build `app/api/credits/checkout/route.ts` POST handler to create Checkout sessions
+- [x] Build `app/dashboard/credits/page.tsx` with balance display and package cards
