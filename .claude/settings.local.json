@@ -1,6 +1,7 @@
 {
   "enabledMcpjsonServers": [
-    "shadcn"
+    "shadcn",
+    "better-auth"
   ],
   "enableAllProjectMcpServers": true
 }
