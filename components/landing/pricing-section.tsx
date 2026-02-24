@@ -12,42 +12,53 @@ import {
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    description: "Get started at no cost.",
-    features: ["10 agent runs / month", "1 workspace", "Community support"],
-    cta: "Get started",
+    name: "Starter",
+    price: "$10",
+    credits: "100 credits",
+    perCredit: "$0.10 / credit",
+    description: "Trying it out.",
+    features: [
+      "100 AI actions",
+      "Campaign generation",
+      "Ad copy creation",
+      "Optimization runs",
+    ],
+    cta: "Buy credits",
     href: "/signup",
     variant: "outline" as const,
     highlight: false,
   },
   {
-    name: "Pro",
-    price: "$19",
-    description: "For individuals who move fast.",
+    name: "Growth",
+    price: "$40",
+    credits: "500 credits",
+    perCredit: "$0.08 / credit",
+    description: "Running campaigns.",
     features: [
-      "500 agent runs / month",
-      "Unlimited workspaces",
-      "Priority support",
-      "Advanced analytics",
+      "500 AI actions",
+      "Campaign generation",
+      "Ad copy creation",
+      "Optimization runs",
     ],
-    cta: "Get started",
+    cta: "Buy credits",
     href: "/signup",
     variant: "default" as const,
     highlight: true,
   },
   {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For teams with custom needs.",
+    name: "Pro",
+    price: "$99",
+    credits: "1,500 credits",
+    perCredit: "$0.07 / credit",
+    description: "Scaling up.",
     features: [
-      "Unlimited agent runs",
-      "SSO & advanced security",
-      "Dedicated support",
-      "Custom integrations",
+      "1,500 AI actions",
+      "Campaign generation",
+      "Ad copy creation",
+      "Optimization runs",
     ],
-    cta: "Contact sales",
-    href: "mailto:sales@aigency.ai",
+    cta: "Buy credits",
+    href: "/signup",
     variant: "outline" as const,
     highlight: false,
   },
@@ -58,9 +69,9 @@ export default function PricingSection() {
     <section className="py-20">
       <div className="mx-auto max-w-5xl px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Simple pricing</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Pay as you go</h2>
           <p className="mt-2 text-muted-foreground">
-            Start free. Scale as you grow.
+            Buy credits and use them when you need. No subscriptions, no commitments.
           </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-3">
@@ -73,16 +84,14 @@ export default function PricingSection() {
                 <div className="flex items-center justify-between">
                   <CardTitle>{plan.name}</CardTitle>
                   {plan.highlight && (
-                    <Badge>Most popular</Badge>
+                    <Badge>Best value</Badge>
                   )}
                 </div>
                 <div className="mt-1">
                   <span className="text-3xl font-bold">{plan.price}</span>
-                  {plan.price !== "Custom" && (
-                    <span className="text-muted-foreground">/mo</span>
-                  )}
+                  <span className="ml-2 text-muted-foreground">{plan.credits}</span>
                 </div>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardDescription>{plan.perCredit} — {plan.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm">
@@ -102,6 +111,9 @@ export default function PricingSection() {
             </Card>
           ))}
         </div>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          1 credit = 1 AI action (campaign generation, ad optimization, or creative generation)
+        </p>
       </div>
     </section>
   )
