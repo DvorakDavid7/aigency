@@ -25,6 +25,7 @@ model User {
   credits          Int       @default(0)
   sessions         Session[]
   accounts         Account[]
+  projects         Project[]
 
   @@unique([email])
   @@map("user")
@@ -64,6 +65,19 @@ model Account {
 
   @@index([userId])
   @@map("account")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@map("project")
 }
 
 model Verification {
