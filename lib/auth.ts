@@ -59,6 +59,10 @@ export const auth = betterAuth({
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
       scope: ["email", "public_profile", "ads_management"],
+      ...(process.env.FACEBOOK_CONFIG_ID && { configId: process.env.FACEBOOK_CONFIG_ID }),
+      mapProfileToUser: (profile) => ({
+        email: profile.email ?? `fb_${profile.id}@noemail.local`,
+      }),
     },
   },
   plugins: buildPlugins(),
