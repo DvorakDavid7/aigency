@@ -1,17 +1,52 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { genericOAuth } from "better-auth/plugins";
 import { stripe } from "@better-auth/stripe";
 import Stripe from "stripe";
 import prisma from "./prisma";
 
 function buildPlugins() {
-  if (!process.env.STRIPE_SECRET_KEY) return [];
+  const plugins = [
+    genericOAuth({
+      config: [
+        {
+          providerId: "facebook-ads",
+          clientId: process.env.FACEBOOK_CLIENT_ID as string,
+          clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+          authorizationUrl: "https://www.facebook.com/v21.0/dialog/oauth",
+          tokenUrl: "https://graph.facebook.com/v21.0/oauth/access_token",
+          scopes: [
+            "ads_management",
+            "ads_read",
+            "business_management",
+            "pages_read_engagement",
+          ],
+          getUserInfo: async (tokens) => {
+            const res = await fetch(
+              `https://graph.facebook.com/v21.0/me?fields=id,name,email&access_token=${tokens.accessToken}`
+            );
+            const data = await res.json();
+            return {
+              id: data.id,
+              name: data.name ?? null,
+              email: data.email ?? null,
+              image: undefined,
+              emailVerified: false,
+            };
+          },
+        },
+      ],
+    }),
+  ];
+
+  if (!process.env.STRIPE_SECRET_KEY) return plugins;
 
   const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2026-01-28.clover",
   });
 
   return [
+    ...plugins,
     stripe({
       stripeClient,
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,

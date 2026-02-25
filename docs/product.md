@@ -1,221 +1,217 @@
-# AI-Powered Facebook PPC Optimization SaaS
+# Aigency — Your AI Marketing Agency
 
-## 1. Overview
+## 1. What It Is
 
-This project is a SaaS platform that automates the creation, management, and optimization of Facebook PPC advertising campaigns using the Facebook Marketing API and AI-driven optimization algorithms.
+Aigency is an autonomous AI marketing agent that runs Facebook ad campaigns on behalf of business owners. The user describes their business, sets a budget, and Aigency handles everything else — strategy, creative, targeting, deployment, and continuous optimization.
 
-The platform is designed to replace or significantly reduce the need for a traditional marketing agency by automating:
+There is no marketing knowledge required. No dashboards to learn. No campaign settings to configure. The user talks to the AI, approves key decisions, and watches results come in.
 
-- Campaign creation
-- Creative generation (ad copy + visuals)
-- Audience targeting
-- Budget allocation
-- Performance monitoring
-- Continuous optimization
-
-The goal is to provide businesses (primarily SMBs and startups) with a self-optimizing ad system that maximizes ROAS (Return on Ad Spend) with minimal manual effort.
+**The core promise:** agency-level Facebook advertising results, without hiring an agency.
 
 ---
 
-## 2. Target Customers
+## 2. Primary Target Customer — Phase 1
 
-- Small to medium businesses
-- E-commerce brands
-- Service-based businesses
-- Solo founders and startups
-- Businesses currently using marketing agencies
-- Businesses running Facebook/Meta ads but lacking optimization expertise
-- SMAs agencies
+**The business owner who just wants results.**
 
----
+- Solo founders and small business owners
+- E-commerce brands with a product to sell
+- Service businesses looking for leads (dentists, lawyers, coaches, gyms, etc.)
+- Startups that need customer acquisition but have no marketing team
+- Businesses currently paying a marketing agency and unsatisfied with results
+- Businesses that tried running Facebook ads themselves and gave up
 
-## 3. Core Value Proposition
+**Their profile:**
+- No knowledge of Facebook Ads Manager, campaign structure, or PPC optimization
+- Has a budget to spend on ads but doesn't know how to spend it effectively
+- Wants to promote their product or service but doesn't know where to start
+- Values results over control — they don't want to manage campaigns, they want customers
+- Frustrated by the complexity and cost of traditional agencies
 
-**“Automated Facebook Ads Management Powered by AI — Agency-Level Results Without the Agency.”**
-
-The system:
-- Understands the client’s business
-- Automatically builds ad campaigns
-- Continuously improves performance based on real data
-- Reduces cost per acquisition (CPA)
-- Increases conversion rate and ROAS
+**What they want to say:** *"Here's my business, here's my budget, get me customers."*
 
 ---
 
-## 4. Core Features
+## 3. How It Works
 
-### 4.1 Business Onboarding Engine
+### 3.1 Onboarding via Chat
 
-The app guides users through a structured onboarding process to collect:
+The user has a natural conversation with the AI agent. The agent asks the right questions to understand the business:
 
-- Business type
-- Target audience description
-- Product/service details
-- Pricing
-- Unique value proposition
-- Competitor information
-- Brand tone and positioning
-- Budget constraints
-- Geographic targeting
-- Conversion goals (leads, purchases, traffic, etc.)
+- What does the business do?
+- Who is the ideal customer?
+- What is the product or service and what does it cost?
+- What makes it different from competitors?
+- What is the goal — leads, sales, website traffic, app installs?
+- What is the monthly ad budget?
+- Where are the customers located?
 
-The system converts this into a structured campaign strategy model.
+No forms. No jargon. Just a conversation. The agent builds a structured campaign brief from the answers.
 
----
+### 3.2 Facebook Account Connection
 
-### 4.2 AI Campaign Generation
+When ready to launch, the agent prompts the user to connect their Facebook Business account via OAuth. One-time setup. The agent explains why it needs access and what it will do with it.
 
-Using the collected data, the system:
+### 3.3 Campaign Generation and Approval
 
-- Selects optimal campaign objective (Conversions, Traffic, Leads, Sales)
-- Creates campaign structure:
-  - Campaign
-  - Ad sets
-  - Ads
-- Generates:
-  - Ad copy variations
-  - Headlines
-  - Primary text
-  - Descriptions
-  - Call-to-actions
-- Generates or suggests image/video creatives (AI-assisted)
-- Suggests targeting strategy:
-  - Interest-based targeting
-  - Lookalike audiences
-  - Retargeting
-- Sets initial budget allocation
+The agent presents a campaign plan in plain language:
 
-Campaigns are deployed automatically using the Facebook Marketing API.
+- What type of campaign it will run and why
+- Who it will target and why
+- What the ads will say
+- How the budget will be allocated
+- What results to expect in the first 2 weeks
 
----
+The user approves with one click or asks the agent to adjust anything. The agent then deploys the campaign to Facebook automatically.
 
-### 4.3 Intelligent Optimization Engine
+### 3.4 Autonomous Management
 
-The system continuously collects performance data:
+Once live, the agent manages the campaign continuously:
 
-- CTR (Click-through rate)
-- CPC (Cost per click)
-- CPA (Cost per acquisition)
-- ROAS
-- Conversion rate
-- Frequency
-- Relevance score
-- Engagement metrics
+- Monitors performance metrics every few hours
+- Pauses underperforming ads automatically
+- Reallocates budget to what is working
+- Rotates creatives before fatigue sets in
+- Scales spend when ROAS thresholds are met
+- Runs A/B tests and declares winners
 
-Based on predefined optimization rules and machine learning models, the system can automatically:
+The user is never burdened with these decisions. The agent handles them and posts a plain-language update to the chat when something significant happens.
 
-- Pause underperforming ads
-- Reallocate budget to high-performing ad sets
-- Duplicate winning ads
-- Rotate creatives
-- Adjust audience segments
-- Modify bidding strategies
-- Scale budgets when ROAS thresholds are met
+### 3.5 User Approvals
+
+For high-stakes actions the agent asks before acting:
+
+- Increasing the budget significantly
+- Launching a new campaign
+- Changing the core audience targeting
+- Pausing the entire campaign
+
+For routine optimizations (pausing a single underperforming ad, reallocating small budget amounts) the agent acts autonomously and reports back.
+
+### 3.6 Results Reporting
+
+The user sees a simple performance summary:
+
+- How much has been spent
+- How many people were reached
+- How many leads or sales were generated
+- Cost per lead or cost per acquisition
+- Week-over-week trend
+
+No campaign jargon. No ad set breakdowns. Just the numbers that matter to a business owner.
 
 ---
 
-### 4.4 A/B Testing Automation
+## 4. The User Experience
 
-- Automatically generates multiple ad variations
-- Monitors statistical significance
-- Declares winners
-- Automatically scales winning variations
-- Replaces losing variants with new AI-generated ones
+The entire product is driven through a chat interface. There is no complex dashboard. The user opens their project and sees a conversation with their AI marketing agent — past decisions, current campaign status, recent optimizations, and upcoming recommendations.
 
----
+The UI has three elements:
 
-### 4.5 Performance Analytics Dashboard
+1. **Chat** — the primary interface. All interaction happens here.
+2. **Artifacts panel** — generated assets the user can reference (campaign brief, ad copy, performance summaries, creatives).
+3. **Activity feed** — a log of what the agent has done autonomously so the user always knows what is happening.
 
-Users can see:
+This is intentionally simple. The complexity lives inside the AI, not in the UI.
 
-- Real-time performance metrics
-- ROAS trends
-- Budget usage
-- Conversion funnels
-- AI insights and recommendations
-- Predicted performance forecasts
+### 4.1 Multiple Conversations per Project
 
-The dashboard prioritizes clarity and actionable insights.
+Each project contains multiple conversations, organised by purpose. The user rarely creates them manually — most are opened automatically by the agent when a new campaign launches or a significant event occurs.
 
----
+Three types of conversations exist within a project:
 
-### 4.6 Predictive Optimization (Advanced Phase)
+- **Onboarding** — one per project, happens once, archived after setup. Captures the business brief.
+- **Campaign threads** — one per campaign. All decisions, approvals, optimizations, and updates for that campaign live here. Closed when the campaign ends but remains searchable.
+- **Agent-initiated threads** — opened automatically by the background agent for weekly performance reports, budget alerts, scaling opportunities, or any significant event requiring attention.
 
-Future features:
+The left panel organises conversations by status:
 
-- Predict campaign fatigue
-- Predict optimal scaling timing
-- Detect audience saturation
-- Suggest new creative angles before performance drops
+```
+ACTIVE
+  Campaign: Summer Sale
+  Campaign: Retargeting
 
----
+AGENT UPDATES
+  Weekly Report        ← unread badge
+  Budget Alert
 
-## 5. Competitive Advantage
+COMPLETED
+  Onboarding
+  Spring Campaign
+```
 
-Compared to marketing agencies:
+This keeps each thread focused, makes history searchable, and mirrors how a real agency communicates — separate threads per campaign, not one endless chain.
 
-- Lower cost
-- Faster iteration cycles
-- 24/7 optimization
-- Data-driven decisions
-- No human bias
-- Scalable
+### 4.2 Project Brief and Scope Changes
 
-Compared to existing tools:
+The agent builds a structured brief during onboarding capturing everything it needs to manage campaigns: business description, product, target audience, goal, budget, location, and unique selling point. This brief is the source of truth the AI reads before generating or optimising anything.
 
-- Fully automated (not just analytics)
-- AI-generated creatives
-- Closed-loop optimization system
-- Minimal marketing knowledge required from user
+Users can update the brief in two ways:
+
+- **Via chat** — the natural approach. The user tells the agent *"Actually, I want to focus on restaurants, not retail"* and the agent updates the brief and adjusts strategy accordingly.
+- **Brief card in the Artifacts panel** — a structured view of what the agent currently knows about the business. Readable at a glance, with a direct edit option for precise corrections.
+
+This ensures the user always knows exactly what context the AI is working from, and can correct it at any time without re-doing the full onboarding conversation.
 
 ---
 
-## 6. Revenue Model
+## 5. Natural Expansion — Phase 2: The Professional Workbench
 
-Possible models:
+Once the AI engine is proven to deliver results, the same engine can be exposed to a second type of user: **professional marketers and agencies**.
 
-- Monthly subscription tiers (based on ad spend)
-- Percentage of ad spend
-- Performance-based fee (percentage of profit uplift)
-- Hybrid subscription + performance model
+**Their profile:**
+- Freelance media buyers and performance marketers
+- Digital marketing agencies managing multiple clients
+- In-house marketing teams at mid-size companies
+- Businesses that understand Facebook Ads but want AI-assisted optimization
 
-Example tiers:
+**What they need beyond Phase 1:**
+- Full visibility into campaign structure — ad sets, audiences, creatives, bidding
+- Ability to override AI decisions and set their own rules
+- Multi-client project management
+- Detailed performance analytics with breakdowns
+- White-label capability to present results to their own clients
 
-- Starter (up to $5k ad spend/month)
-- Growth ($5k–$50k)
-- Scale ($50k+)
+**How the expansion works:**
 
----
+The AI engine underneath does not change. The same autonomous optimization logic runs. But a professional UI layer is added on top that exposes the internals — campaign tables, targeting details, creative performance grids, manual override controls.
 
-## 7. Technical Scope
-
-Core integrations:
-
-- Facebook Marketing API
-- AI model for content generation
-- Data storage for performance tracking
-- Optimization engine (rule-based + ML)
-
-System components:
-
-1. Onboarding Module
-2. Campaign Generation Engine
-3. Facebook API Integration Layer
-4. Performance Data Collector
-5. Optimization Engine
-6. Analytics Dashboard
-7. AI Creative Generator
+For agencies this becomes a force multiplier: the AI handles the routine optimization work across all their clients simultaneously while the human marketer focuses on strategy and client relationships.
 
 ---
 
-## 8. Long-Term Vision
+## 6. Core Technical Components
 
-Create a fully autonomous ad-buying system that:
+1. **Onboarding conversation engine** — structured chat flow that extracts business context and builds a campaign brief
+2. **Facebook OAuth integration** — connects user's Facebook Business account
+3. **AI campaign generation** — takes the brief, generates full campaign structure using Claude
+4. **Facebook Marketing API layer** — deploys and manages campaigns programmatically
+5. **Performance data collector** — pulls metrics from Facebook API on a schedule
+6. **Optimization engine** — rule-based + AI logic that takes autonomous actions
+7. **Notification and approval system** — routes high-stakes decisions to the user, executes routine ones automatically
+8. **Artifact storage** — saves generated briefs, ad copy, creatives, and reports for reference
 
-- Learns from aggregated anonymized campaign data
-- Improves across all clients
-- Becomes a “self-driving ad platform”
-- Expands to Google Ads, TikTok Ads, LinkedIn Ads
+---
 
-**Ultimate goal:**  
-An AI advertising manager that replaces 80% of agency work.
+## 7. Revenue Model
+
+**Phase 1 — Subscription tiers based on ad spend managed:**
+
+- Starter — up to $2,000/month ad spend
+- Growth — up to $10,000/month ad spend
+- Scale — up to $50,000/month ad spend
+- Enterprise — unlimited, custom pricing
+
+The platform fee is a monthly subscription. The ad spend goes directly to Facebook — Aigency never touches the client's ad budget.
+
+**Phase 2 — Agency tier:**
+
+Per-seat pricing for professional marketers managing multiple client accounts. Higher price point, multi-client dashboard, white-label reporting.
+
+---
+
+## 8. Success Metric
+
+The single most important metric: **does the AI deliver better ROAS than the user would achieve on their own or with a typical agency?**
+
+Everything else is secondary. The product only works if the AI actually delivers results. Phase 1 exists to prove this with real campaigns before scaling to a broader user base.

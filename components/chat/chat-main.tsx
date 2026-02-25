@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { ArrowUp, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { FbConnectBanner } from "@/components/chat/fb-connect-banner"
 
 type Message = {
   id: string
@@ -23,9 +24,11 @@ const INITIAL_MESSAGES: Message[] = [
 type Props = {
   projectId: string
   projectName: string
+  facebookConnected: boolean
+  fbError: string | null
 }
 
-export function ChatMain({ projectId, projectName }: Props) {
+export function ChatMain({ projectId, projectName, facebookConnected, fbError }: Props) {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -90,6 +93,11 @@ export function ChatMain({ projectId, projectName }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Facebook connect banner */}
+      {!facebookConnected && (
+        <FbConnectBanner projectId={projectId} error={fbError} />
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
