@@ -44,7 +44,7 @@ export default function SignInPage() {
   }
 
   async function handleFacebook() {
-    await authClient.signIn.social({ provider: "facebook", callbackURL: "/dashboard" })
+    await authClient.signIn.social({ provider: "facebook", callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard` })
   }
 
   return (
