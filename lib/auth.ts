@@ -50,7 +50,7 @@ export const auth = betterAuth({
     facebook: {
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-      scopes: ['ads_management', 'ads_read', 'read_insights']
+      scope: ['ads_management', 'ads_read', 'read_insights']
     },
   },
   plugins: buildPlugins(),
