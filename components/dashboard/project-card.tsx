@@ -13,7 +13,7 @@ type Props = {
 
 export default function ProjectCard({ project }: Props) {
   return (
-    <Link href={`/dashboard/projects/${project.id}`}>
+    <Link href={`/chat/${project.id}`}>
       <Card className="h-full cursor-pointer transition-colors hover:border-primary">
         <CardHeader>
           <CardTitle className="text-base">{project.name}</CardTitle>

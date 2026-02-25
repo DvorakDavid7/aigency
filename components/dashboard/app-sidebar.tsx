@@ -3,18 +3,11 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  Activity,
   ArrowLeft,
-  BarChart2,
   CreditCard,
   FolderOpen,
   LayoutDashboard,
-  Megaphone,
-  Plug,
-  Settings,
-  Target,
-  TrendingUp,
-  Users,
+  MessageSquare,
   type LucideIcon,
 } from "lucide-react"
 import {
@@ -33,23 +26,13 @@ type NavItem = { title: string; url: string; icon: LucideIcon }
 
 const GLOBAL_NAV: NavItem[] = [
   { title: "Projects", url: "/dashboard/projects", icon: FolderOpen },
-  { title: "Team", url: "/dashboard/team", icon: Users },
-  { title: "Integrations", url: "/dashboard/integrations", icon: Plug },
-  { title: "Usage", url: "/dashboard/usage", icon: BarChart2 },
   { title: "Billing", url: "/dashboard/credits", icon: CreditCard },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ]
 
 function projectNav(id: string): NavItem[] {
   return [
     { title: "Overview", url: `/dashboard/projects/${id}`, icon: LayoutDashboard },
-    { title: "Analysis", url: `/dashboard/projects/${id}/analysis`, icon: TrendingUp },
-    { title: "Marketing", url: `/dashboard/projects/${id}/marketing`, icon: Megaphone },
-    { title: "Campaigns", url: `/dashboard/projects/${id}/campaigns`, icon: Target },
-    { title: "Statistics", url: `/dashboard/projects/${id}/statistics`, icon: BarChart2 },
-    { title: "Usage", url: `/dashboard/projects/${id}/usage`, icon: Activity },
-    { title: "Billing", url: `/dashboard/projects/${id}/billing`, icon: CreditCard },
-    { title: "Settings", url: `/dashboard/projects/${id}/settings`, icon: Settings },
+    { title: "Chat", url: `/chat/${id}`, icon: MessageSquare },
   ]
 }
 
@@ -101,8 +84,7 @@ export function AppSidebar() {
             {navItems.map((item) => {
               const active =
                 pathname === item.url ||
-                (item.url !== `/dashboard/projects/${projectId}` &&
-                  pathname.startsWith(item.url + "/"))
+                (item.url === `/chat/${projectId}` && pathname.startsWith(`/chat/${projectId}`))
               return (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
