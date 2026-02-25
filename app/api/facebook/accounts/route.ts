@@ -11,16 +11,17 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const connection = await prisma.facebookConnection.findUnique({
-    where: { userId: session.user.id },
+  // Read token from Better Auth's account table (stored during Facebook login)
+  const fbAccount = await prisma.account.findFirst({
+    where: { userId: session.user.id, providerId: "facebook" },
     select: { accessToken: true },
   })
 
-  if (!connection) {
-    return NextResponse.json({ error: "No Facebook connection" }, { status: 400 })
+  if (!fbAccount?.accessToken) {
+    return NextResponse.json({ error: "No Facebook account connected" }, { status: 400 })
   }
 
-  FacebookAdsApi.init(connection.accessToken)
+  FacebookAdsApi.init(fbAccount.accessToken)
   const me = new User("me")
   const accounts = await me.getAdAccounts(["id", "name", "account_status", "currency"])
 

@@ -6,6 +6,7 @@ import { DefaultChatTransport } from "ai"
 import { ArrowUp, Bot, User, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 
 type Props = {
   projectId: string
@@ -139,9 +140,10 @@ export function ChatMain({ projectId, projectName, fbConnected }: Props) {
               variant="outline"
               className="shrink-0"
               onClick={() =>
-                window.location.assign(
-                  `/api/facebook/connect?projectId=${projectId}`
-                )
+                authClient.signIn.social({
+                  provider: "facebook",
+                  callbackURL: `/facebook/select-account?projectId=${projectId}`,
+                })
               }
             >
               <Facebook className="mr-2 h-4 w-4" />
