@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import { ArrowUp, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { FbConnectBanner } from "@/components/chat/fb-connect-banner"
 
 type Message = {
   id: string
@@ -24,11 +23,9 @@ const INITIAL_MESSAGES: Message[] = [
 type Props = {
   projectId: string
   projectName: string
-  facebookConnected: boolean
-  fbError: string | null
 }
 
-export function ChatMain({ projectId, projectName, facebookConnected, fbError }: Props) {
+export function ChatMain({ projectId, projectName }: Props) {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -40,7 +37,6 @@ export function ChatMain({ projectId, projectName, facebookConnected, fbError }:
 
   function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value)
-    // Auto-resize textarea
     const el = e.target
     el.style.height = "auto"
     el.style.height = Math.min(el.scrollHeight, 160) + "px"
@@ -65,13 +61,12 @@ export function ChatMain({ projectId, projectName, facebookConnected, fbError }:
       textareaRef.current.style.height = "auto"
     }
 
-    // Placeholder assistant response
+    // Placeholder — AI integration coming in Phase 3
     setTimeout(() => {
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content:
-          "I received your message. This is a placeholder response — AI integration coming soon.",
+        content: "I received your message. AI integration coming soon.",
       }
       setMessages((prev) => [...prev, assistantMsg])
     }, 800)
@@ -87,17 +82,10 @@ export function ChatMain({ projectId, projectName, facebookConnected, fbError }:
           </div>
           <div>
             <p className="text-sm font-medium leading-none">Marketing Agent</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-            {projectName} · Ready
-          </p>
+            <p className="text-xs text-muted-foreground mt-0.5">{projectName} · Ready</p>
           </div>
         </div>
       </div>
-
-      {/* Facebook connect banner */}
-      {!facebookConnected && (
-        <FbConnectBanner projectId={projectId} error={fbError} />
-      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
@@ -107,7 +95,6 @@ export function ChatMain({ projectId, projectName, facebookConnected, fbError }:
               key={msg.id}
               className={cn("flex gap-3", msg.role === "user" && "flex-row-reverse")}
             >
-              {/* Avatar */}
               <div
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center rounded-full",
@@ -123,7 +110,6 @@ export function ChatMain({ projectId, projectName, facebookConnected, fbError }:
                 )}
               </div>
 
-              {/* Bubble */}
               <div
                 className={cn(
                   "max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
