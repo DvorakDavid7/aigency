@@ -3,16 +3,17 @@
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
-import { ArrowUp, Bot, User } from "lucide-react"
+import { ArrowUp, Bot, User, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 type Props = {
   projectId: string
   projectName: string
+  fbConnected: boolean
 }
 
-export function ChatMain({ projectId, projectName }: Props) {
+export function ChatMain({ projectId, projectName, fbConnected }: Props) {
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -125,6 +126,30 @@ export function ChatMain({ projectId, projectName }: Props) {
           <div ref={bottomRef} />
         </div>
       </div>
+
+      {/* Facebook connect banner */}
+      {!fbConnected && (
+        <div className="shrink-0 border-t border-border bg-muted/30 px-6 py-3">
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Connect your Facebook ad account to start running campaigns.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0"
+              onClick={() =>
+                window.location.assign(
+                  `/api/facebook/connect?projectId=${projectId}`
+                )
+              }
+            >
+              <Facebook className="mr-2 h-4 w-4" />
+              Connect
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Input area */}
       <div className="shrink-0 border-t border-border px-6 py-4">

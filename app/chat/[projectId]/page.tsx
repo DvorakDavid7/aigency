@@ -1,3 +1,5 @@
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { ChatLeftPanel } from "@/components/chat/chat-left-panel"
 import { ChatMain } from "@/components/chat/chat-main"
@@ -10,20 +12,30 @@ export default async function ProjectChatPage({
 }) {
   const { projectId } = await params
 
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: {
-      id: true,
-      name: true,
-      conversations: {
-        orderBy: { updatedAt: "desc" },
-        select: { id: true, title: true, updatedAt: true },
-        take: 30,
+  const session = await auth.api.getSession({ headers: await headers() })
+
+  const [project, facebookConnection] = await Promise.all([
+    prisma.project.findUnique({
+      where: { id: projectId },
+      select: {
+        id: true,
+        name: true,
+        conversations: {
+          orderBy: { updatedAt: "desc" },
+          select: { id: true, title: true, updatedAt: true },
+          take: 30,
+        },
       },
-    },
-  })
+    }),
+    prisma.facebookConnection.findUnique({
+      where: { userId: session!.user.id },
+      select: { fbAccountId: true },
+    }),
+  ])
 
   if (!project) return null
+
+  const fbConnected = !!facebookConnection?.fbAccountId
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -32,7 +44,11 @@ export default async function ProjectChatPage({
         projectName={project.name}
         conversations={project.conversations}
       />
-      <ChatMain projectId={project.id} projectName={project.name} />
+      <ChatMain
+        projectId={project.id}
+        projectName={project.name}
+        fbConnected={fbConnected}
+      />
       <ChatRightPanel />
     </div>
   )
