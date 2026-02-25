@@ -140,7 +140,7 @@ export function ChatMain({ projectId, projectName, fbConnected }: Props) {
               variant="outline"
               className="shrink-0"
               onClick={() =>
-                authClient.signIn.social({
+                authClient.linkSocial({
                   provider: "facebook",
                   callbackURL: `/facebook/select-account?projectId=${projectId}`,
                 })

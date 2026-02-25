@@ -25,7 +25,7 @@ export function FacebookIntegrationCard({ connected, connectedSince, fbAccountId
   }
 
   function handleConnect() {
-    authClient.signIn.social({
+    authClient.linkSocial({
       provider: "facebook",
       callbackURL: "/facebook/select-account",
     })
