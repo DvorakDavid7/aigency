@@ -1,24 +1,11 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useChat } from "@ai-sdk/react"
+import { DefaultChatTransport } from "ai"
 import { ArrowUp, Bot, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-
-type Message = {
-  id: string
-  role: "user" | "assistant"
-  content: string
-}
-
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content:
-      "Hi! I'm your AI marketing agent. I can help you create and optimize Facebook ad campaigns, generate ad copy, analyze performance, and more. What would you like to work on today?",
-  },
-]
 
 type Props = {
   projectId: string
@@ -26,16 +13,24 @@ type Props = {
 }
 
 export function ChatMain({ projectId, projectName }: Props) {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: { projectId },
+    }),
+  })
+
+  const isLoading = status === "streaming" || status === "submitted"
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value)
     const el = e.target
     el.style.height = "auto"
@@ -51,25 +46,12 @@ export function ChatMain({ projectId, projectName }: Props) {
 
   function send() {
     const text = input.trim()
-    if (!text) return
-
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: text }
-    setMessages((prev) => [...prev, userMsg])
+    if (!text || isLoading) return
+    sendMessage({ text })
     setInput("")
-
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"
     }
-
-    // Placeholder — AI integration coming in Phase 3
-    setTimeout(() => {
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "I received your message. AI integration coming soon.",
-      }
-      setMessages((prev) => [...prev, assistantMsg])
-    }, 800)
   }
 
   return (
@@ -82,7 +64,9 @@ export function ChatMain({ projectId, projectName }: Props) {
           </div>
           <div>
             <p className="text-sm font-medium leading-none">Marketing Agent</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{projectName} · Ready</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {projectName} · {isLoading ? "Thinking…" : "Ready"}
+            </p>
           </div>
         </div>
       </div>
@@ -90,6 +74,20 @@ export function ChatMain({ projectId, projectName }: Props) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
         <div className="mx-auto max-w-2xl space-y-6">
+          {/* Welcome message shown when no messages yet */}
+          {messages.length === 0 && (
+            <div className="flex gap-3">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Bot className="h-4 w-4" />
+              </div>
+              <div className="max-w-[75%] rounded-2xl rounded-tl-sm bg-muted px-4 py-3 text-sm leading-relaxed text-foreground">
+                Hi! I&apos;m your AI marketing agent. I can help you create and optimize Facebook ad
+                campaigns, generate ad copy, analyze performance, and more. What would you like to
+                work on today?
+              </div>
+            </div>
+          )}
+
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -118,7 +116,9 @@ export function ChatMain({ projectId, projectName }: Props) {
                     : "bg-primary text-primary-foreground rounded-tr-sm"
                 )}
               >
-                {msg.content}
+                {msg.parts
+                  .map((part) => (part.type === "text" ? part.text : ""))
+                  .join("")}
               </div>
             </div>
           ))}
@@ -134,7 +134,7 @@ export function ChatMain({ projectId, projectName }: Props) {
               ref={textareaRef}
               rows={1}
               value={input}
-              onChange={handleInput}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="Message Marketing Agent..."
               className="flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground min-h-[24px] leading-relaxed"
@@ -142,7 +142,7 @@ export function ChatMain({ projectId, projectName }: Props) {
             <Button
               size="icon"
               className="h-8 w-8 shrink-0 rounded-lg"
-              disabled={!input.trim()}
+              disabled={!input.trim() || isLoading}
               onClick={send}
             >
               <ArrowUp className="h-4 w-4" />
