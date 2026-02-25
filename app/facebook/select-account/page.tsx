@@ -41,7 +41,7 @@ function SelectAccountContent() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fbAccountId: selected }),
     })
-    const dest = projectId ? `/chat/${projectId}` : "/dashboard"
+    const dest = projectId ? `/chat/${projectId}` : "/dashboard/integrations"
     router.push(dest)
   }
 

@@ -8,6 +8,7 @@ import {
   FolderOpen,
   LayoutDashboard,
   MessageSquare,
+  Plug,
   type LucideIcon,
 } from "lucide-react"
 import {
@@ -26,6 +27,7 @@ type NavItem = { title: string; url: string; icon: LucideIcon }
 
 const GLOBAL_NAV: NavItem[] = [
   { title: "Projects", url: "/dashboard/projects", icon: FolderOpen },
+  { title: "Integrations", url: "/dashboard/integrations", icon: Plug },
   { title: "Billing", url: "/dashboard/credits", icon: CreditCard },
 ]
 
