@@ -43,6 +43,14 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  onAPIError: {
+    onError(error, ctx) {
+      console.error("[Better Auth] API error logger:", {
+        error,
+        context: ctx,
+      })
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
@@ -50,7 +58,7 @@ export const auth = betterAuth({
     facebook: {
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
-      scope: ['email', 'public_profile', 'ads_management', 'ads_read', 'read_insights']
+      scope: ["email", "public_profile", "ads_management", "ads_read", "read_insights"],
     },
   },
   plugins: buildPlugins(),
