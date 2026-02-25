@@ -175,8 +175,7 @@ model FacebookConnection {
   id          String   @id @default(cuid())
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken String
-  fbAccountId String?  // set after user selects their ad account
+  fbAccountId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

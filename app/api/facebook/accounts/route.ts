@@ -40,9 +40,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "fbAccountId is required" }, { status: 400 })
   }
 
-  await prisma.facebookConnection.update({
+  await prisma.facebookConnection.upsert({
     where: { userId: session.user.id },
-    data: { fbAccountId },
+    update: { fbAccountId },
+    create: { userId: session.user.id, fbAccountId },
   })
 
   return NextResponse.json({ ok: true })
