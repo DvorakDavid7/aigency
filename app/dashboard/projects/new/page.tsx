@@ -28,7 +28,7 @@ export default function NewProjectPage() {
         setError(data.error ?? "Something went wrong")
         return
       }
-      router.push(`/dashboard/projects/${data.id}`)
+      router.push(`/chat/${data.id}/${data.conversationId}`)
     } finally {
       setLoading(false)
     }

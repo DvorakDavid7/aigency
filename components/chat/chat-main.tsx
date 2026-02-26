@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
+import { DefaultChatTransport, type UIMessage } from "ai"
 import { ArrowUp, Bot, User, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -12,9 +12,11 @@ type Props = {
   projectId: string
   projectName: string
   fbConnected: boolean
+  conversationId?: string
+  initialMessages?: UIMessage[]
 }
 
-export function ChatMain({ projectId, projectName, fbConnected }: Props) {
+export function ChatMain({ projectId, projectName, fbConnected, conversationId, initialMessages }: Props) {
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -22,8 +24,9 @@ export function ChatMain({ projectId, projectName, fbConnected }: Props) {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: { projectId },
+      body: { projectId, ...(conversationId ? { conversationId } : {}) },
     }),
+    ...(initialMessages ? { messages: initialMessages } : {}),
   })
 
   const isLoading = status === "streaming" || status === "submitted"
