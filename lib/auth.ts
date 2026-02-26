@@ -54,6 +54,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["facebook"],
+    },
+  },
   socialProviders: {
     facebook: {
       clientId: process.env.FACEBOOK_CLIENT_ID as string,
