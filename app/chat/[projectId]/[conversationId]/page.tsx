@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { ChatLeftPanel } from "@/components/chat/chat-left-panel"
 import { ChatMain } from "@/components/chat/chat-main"
-import { ChatRightPanel } from "@/components/chat/chat-right-panel"
+import { ChatRightPanel, type ArtifactData } from "@/components/chat/chat-right-panel"
 import type { UIMessage } from "ai"
 
 export default async function ConversationChatPage({
@@ -16,7 +16,7 @@ export default async function ConversationChatPage({
 
   const session = await auth.api.getSession({ headers: await headers() })
 
-  const [project, facebookConnection, conversation] = await Promise.all([
+  const [project, facebookConnection, conversation, artifacts] = await Promise.all([
     prisma.project.findUnique({
       where: { id: projectId },
       select: {
@@ -43,6 +43,11 @@ export default async function ConversationChatPage({
         },
       },
     }),
+    prisma.artifact.findMany({
+      where: { projectId },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, type: true, title: true, content: true, createdAt: true, updatedAt: true },
+    }),
   ])
 
   if (!project || !conversation) notFound()
@@ -51,6 +56,15 @@ export default async function ConversationChatPage({
     id: msg.id,
     role: msg.role as "user" | "assistant",
     parts: [{ type: "text" as const, text: msg.content }],
+  }))
+
+  const initialArtifacts: ArtifactData[] = artifacts.map((a) => ({
+    id: a.id,
+    type: a.type as ArtifactData["type"],
+    title: a.title,
+    content: a.content,
+    createdAt: a.createdAt.toISOString(),
+    updatedAt: a.updatedAt.toISOString(),
   }))
 
   const fbConnected = !!facebookConnection?.fbAccountId
@@ -69,7 +83,7 @@ export default async function ConversationChatPage({
         initialMessages={initialMessages}
         conversationId={conversationId}
       />
-      <ChatRightPanel />
+      <ChatRightPanel projectId={project.id} initialArtifacts={initialArtifacts} />
     </div>
   )
 }

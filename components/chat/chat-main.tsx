@@ -27,6 +27,9 @@ export function ChatMain({ projectId, projectName, fbConnected, conversationId, 
       body: { projectId, ...(conversationId ? { conversationId } : {}) },
     }),
     ...(initialMessages ? { messages: initialMessages } : {}),
+    onFinish: () => {
+      window.dispatchEvent(new CustomEvent("aigency:artifact-updated"))
+    },
   })
 
   const isLoading = status === "streaming" || status === "submitted"
