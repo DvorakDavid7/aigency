@@ -31,6 +31,21 @@ When asked to analyze competitors or research the competition:
 4. Once you have researched at least 3 competitors, you MUST call saveCompetitionAnalysis to save the artifact — do not ask for permission, just save it
 5. After saving, give the user a concise summary of your key findings and ad strategy recommendations`
 
+const CAMPAIGN_SYSTEM_PROMPT_BASE = `You are an expert Facebook advertising strategist building a campaign plan for a business owner.
+You already have their business brief. Your job is to design a specific campaign — not re-ask onboarding questions.
+
+Ask only campaign-specific questions, one or two at a time:
+1. What specific offer, product, or service should this campaign promote?
+2. What ad format works best — Image, Carousel, or Video?
+3. How long should the campaign run?
+4. What is the campaign budget in USD (total for this campaign, not monthly)?
+5. What URL should the ads send people to?
+6. Any specific audience refinements beyond the brief (optional)?
+7. What is the single most important message this ad should communicate?
+
+When you have confident answers for all required fields, call the saveCampaign tool immediately — do not ask for confirmation.
+After saving, tell the user their campaign plan is ready and give a brief plain-language summary.`
+
 type BriefContext = {
   businessDescription: string
   product: string
@@ -40,6 +55,24 @@ type BriefContext = {
   monthlyBudget: number
   location: string
   websiteUrl?: string | null
+}
+
+function buildCampaignSystemPrompt(brief: BriefContext): string {
+  const lines = [
+    `- Business: ${brief.businessDescription}`,
+    `- Product/Service: ${brief.product}`,
+    `- Target Audience: ${brief.targetAudience}`,
+    `- Unique Selling Point: ${brief.uniqueSellingPoint}`,
+    `- Campaign Goal: ${brief.goal}`,
+    `- Monthly Budget: $${Math.round(brief.monthlyBudget / 100).toLocaleString()}/month`,
+    `- Location: ${brief.location}`,
+    ...(brief.websiteUrl ? [`- Website: ${brief.websiteUrl}`] : []),
+  ]
+
+  return `${CAMPAIGN_SYSTEM_PROMPT_BASE}
+
+## Business Context (from onboarding brief)
+${lines.join("\n")}`
 }
 
 function buildMarketingSystemPrompt(brief?: BriefContext | null): string {
@@ -81,6 +114,7 @@ export async function POST(req: Request) {
   }: { messages: UIMessage[]; projectId: string; conversationId?: string } = await req.json()
 
   let isOnboarding = false
+  let isCampaign = false
   let brief: BriefContext | null = null
 
   if (conversationId) {
@@ -112,6 +146,9 @@ export async function POST(req: Request) {
 
     if (conversation?.type === "ONBOARDING" && !conversation.project.brief) {
       isOnboarding = true
+    } else if (conversation?.type === "CAMPAIGN" && conversation?.project.brief) {
+      isCampaign = true
+      brief = conversation.project.brief
     } else if (conversation?.project.brief) {
       brief = conversation.project.brief
     }
@@ -119,7 +156,9 @@ export async function POST(req: Request) {
 
   const systemPrompt = isOnboarding
     ? ONBOARDING_SYSTEM_PROMPT
-    : buildMarketingSystemPrompt(brief)
+    : isCampaign && brief
+      ? buildCampaignSystemPrompt(brief)
+      : buildMarketingSystemPrompt(brief)
 
   // Save the incoming user message to DB
   if (conversationId && messages.length > 0) {
@@ -228,6 +267,104 @@ export async function POST(req: Request) {
     },
   }
 
+  // ─── Campaign: saveCampaign tool ─────────────────────────────────────────────
+
+  const campaignInputSchema = z.object({
+    campaignName: z.string().describe("Short name for this campaign"),
+    offer: z.string().describe("The specific offer, product, or service being promoted"),
+    adFormat: z.enum(["IMAGE", "CAROUSEL", "VIDEO"]).describe("Facebook ad format"),
+    duration: z.string().describe("Campaign duration (e.g. '30 days', '2 weeks')"),
+    campaignBudget: z
+      .number()
+      .int()
+      .positive()
+      .describe("Total campaign budget in whole USD dollars"),
+    landingPageUrl: z.string().describe("URL the ads will send users to"),
+    audienceRefinement: z
+      .string()
+      .optional()
+      .describe("Any audience refinements beyond the brief (optional)"),
+    keyMessage: z.string().describe("The single most important message this ad communicates"),
+    headline: z.string().max(40).describe("Ad headline (max 40 characters)"),
+    primaryText: z.string().max(125).describe("Primary ad text (max 125 characters)"),
+    description: z.string().max(30).describe("Ad description (max 30 characters)"),
+    callToAction: z
+      .enum([
+        "LEARN_MORE",
+        "SHOP_NOW",
+        "SIGN_UP",
+        "GET_QUOTE",
+        "CONTACT_US",
+        "BOOK_NOW",
+        "DOWNLOAD",
+        "GET_STARTED",
+      ])
+      .describe("Facebook call-to-action button"),
+    strategy: z.string().describe("Campaign strategy rationale (2-3 paragraphs)"),
+    targetAudience: z.string().describe("Detailed target audience description"),
+    budgetBreakdown: z.string().describe("How the budget will be allocated"),
+    expectedResults: z.string().describe("Expected results in plain language"),
+  })
+
+  const saveCampaignTool = {
+    description:
+      "Save the completed campaign plan as an artifact once you have gathered all required information from the user.",
+    inputSchema: campaignInputSchema,
+    execute: async (input: z.infer<typeof campaignInputSchema>) => {
+      const budgetInCents = input.campaignBudget * 100
+
+      try {
+        let artifactId = ""
+
+        await prisma.$transaction(async (tx) => {
+          const artifact = await tx.artifact.create({
+            data: {
+              projectId: capturedProjectId,
+              conversationId: capturedConversationId ?? null,
+              type: "CAMPAIGN",
+              title: input.campaignName,
+              content: {
+                campaignName: input.campaignName,
+                offer: input.offer,
+                adFormat: input.adFormat,
+                duration: input.duration,
+                campaignBudget: budgetInCents,
+                landingPageUrl: input.landingPageUrl,
+                audienceRefinement: input.audienceRefinement ?? null,
+                keyMessage: input.keyMessage,
+                adCopy: {
+                  headline: input.headline,
+                  primaryText: input.primaryText,
+                  description: input.description,
+                  callToAction: input.callToAction,
+                },
+                strategy: input.strategy,
+                targetAudience: input.targetAudience,
+                budgetBreakdown: input.budgetBreakdown,
+                expectedResults: input.expectedResults,
+              },
+            },
+            select: { id: true },
+          })
+
+          artifactId = artifact.id
+
+          if (capturedConversationId) {
+            await tx.conversation.update({
+              where: { id: capturedConversationId },
+              data: { status: "COMPLETED", title: input.campaignName },
+            })
+          }
+        })
+
+        return { success: true, artifactId }
+      } catch (err) {
+        console.error("[saveCampaign] failed:", err)
+        return { success: false, error: String(err) }
+      }
+    },
+  }
+
   // ─── Marketing: saveCompetitionAnalysis tool ─────────────────────────────────
 
   const competitionInputSchema = z.object({
@@ -316,17 +453,26 @@ export async function POST(req: Request) {
         stopWhen: stepCountIs(3),
         onFinish: handleFinish,
       })
-    : streamText({
-        model: anthropic("claude-sonnet-4-6"),
-        system: systemPrompt,
-        messages: convertedMessages,
-        tools: {
-          webSearch: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
-          saveCompetitionAnalysis: saveCompetitionAnalysisTool,
-        },
-        stopWhen: stepCountIs(30),
-        onFinish: handleFinish,
-      })
+    : isCampaign
+      ? streamText({
+          model: anthropic("claude-sonnet-4-6"),
+          system: systemPrompt,
+          messages: convertedMessages,
+          tools: { saveCampaign: saveCampaignTool },
+          stopWhen: stepCountIs(3),
+          onFinish: handleFinish,
+        })
+      : streamText({
+          model: anthropic("claude-sonnet-4-6"),
+          system: systemPrompt,
+          messages: convertedMessages,
+          tools: {
+            webSearch: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+            saveCompetitionAnalysis: saveCompetitionAnalysisTool,
+          },
+          stopWhen: stepCountIs(30),
+          onFinish: handleFinish,
+        })
 
   return result.toUIMessageStreamResponse()
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { FileText, Search, Sparkles } from "lucide-react"
+import { FileText, Search, Sparkles, Megaphone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,6 +36,27 @@ export type CompetitionContent = {
   opportunities: string
   threats: string
   recommendations: string
+}
+
+export type CampaignContent = {
+  campaignName: string
+  offer: string
+  adFormat: "IMAGE" | "CAROUSEL" | "VIDEO"
+  duration: string
+  campaignBudget: number // stored in cents
+  landingPageUrl: string
+  audienceRefinement?: string | null
+  keyMessage: string
+  adCopy: {
+    headline: string
+    primaryText: string
+    description: string
+    callToAction: string
+  }
+  strategy: string
+  targetAudience: string
+  budgetBreakdown: string
+  expectedResults: string
 }
 
 export type BriefContent = {
@@ -385,6 +406,183 @@ function CompetitionSheet({
   )
 }
 
+// ─── Campaign Sheet ───────────────────────────────────────────────────────────
+
+function CampaignSheet({
+  artifact,
+  onClose,
+}: {
+  artifact: ArtifactData
+  onClose: () => void
+}) {
+  const data = artifact.content as CampaignContent
+
+  const AD_FORMAT_LABELS: Record<string, string> = {
+    IMAGE: "Image",
+    CAROUSEL: "Carousel",
+    VIDEO: "Video",
+  }
+
+  return (
+    <>
+      <SheetHeader className="px-6 pt-5 pb-4 border-b border-border">
+        <SheetTitle>{artifact.title}</SheetTitle>
+        <p className="text-xs text-muted-foreground">
+          Last updated {new Date(artifact.updatedAt).toLocaleDateString()}
+        </p>
+      </SheetHeader>
+
+      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6 min-h-0">
+        {/* Campaign Overview */}
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Campaign Overview
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Format
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                {AD_FORMAT_LABELS[data.adFormat] ?? data.adFormat}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Duration
+              </p>
+              <p className="text-sm font-medium text-foreground">{data.duration}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Budget
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                ${Math.round(data.campaignBudget / 100).toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Goal
+              </p>
+              <p className="text-sm font-medium text-foreground truncate">{data.keyMessage}</p>
+            </div>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Offer
+            </p>
+            <p className="text-sm text-foreground">{data.offer}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5 space-y-0.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Landing Page
+            </p>
+            <a
+              href={data.landingPageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline break-all"
+            >
+              {data.landingPageUrl}
+            </a>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Ad Copy */}
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Ad Copy
+          </p>
+          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Headline
+              </p>
+              <p className="text-sm font-semibold text-foreground">{data.adCopy.headline}</p>
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Primary Text
+              </p>
+              <p className="text-sm text-foreground leading-relaxed">{data.adCopy.primaryText}</p>
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Description
+              </p>
+              <p className="text-sm text-foreground">{data.adCopy.description}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                CTA:
+              </p>
+              <Badge variant="secondary" className="text-xs">
+                {data.adCopy.callToAction.replace(/_/g, " ")}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Strategy */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Strategy
+          </p>
+          <Markdown content={data.strategy} />
+        </div>
+
+        <Separator />
+
+        {/* Targeting */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Target Audience
+          </p>
+          <Markdown content={data.targetAudience} />
+          {data.audienceRefinement && (
+            <div className="mt-2 rounded-md bg-muted/40 px-3 py-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <span className="font-medium">Refinement:</span> {data.audienceRefinement}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        {/* Budget */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Budget Breakdown
+          </p>
+          <Markdown content={data.budgetBreakdown} />
+        </div>
+
+        <Separator />
+
+        {/* Expected Results */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Expected Results
+          </p>
+          <Markdown content={data.expectedResults} />
+        </div>
+      </div>
+
+      <SheetFooter className="px-6 pt-4 pb-5 border-t border-border">
+        <Button variant="outline" onClick={onClose} className="w-full">
+          Close
+        </Button>
+      </SheetFooter>
+    </>
+  )
+}
+
 // ─── Artifact Card ────────────────────────────────────────────────────────────
 
 function ArtifactCard({
@@ -397,6 +595,7 @@ function ArtifactCard({
   const brief = artifact.type === "BRIEF" ? (artifact.content as BriefContent) : null
   const competition =
     artifact.type === "COMPETITION" ? (artifact.content as CompetitionContent) : null
+  const campaign = artifact.type === "CAMPAIGN" ? (artifact.content as CampaignContent) : null
 
   return (
     <button
@@ -406,6 +605,8 @@ function ArtifactCard({
       <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
         {artifact.type === "COMPETITION" ? (
           <Search className="h-3.5 w-3.5 text-muted-foreground" />
+        ) : artifact.type === "CAMPAIGN" ? (
+          <Megaphone className="h-3.5 w-3.5 text-muted-foreground" />
         ) : (
           <FileText className="h-3.5 w-3.5 text-muted-foreground" />
         )}
@@ -441,6 +642,16 @@ function ArtifactCard({
                 {competition.competitors.length !== 1 ? "s" : ""} analyzed
               </p>
             )}
+          </>
+        )}
+        {campaign && (
+          <>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+              {campaign.offer}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              ${Math.round(campaign.campaignBudget / 100).toLocaleString()} · {campaign.duration}
+            </p>
           </>
         )}
       </div>
@@ -553,9 +764,16 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props) {
               onClose={handleSheetClose}
             />
           )}
+          {selectedArtifact?.type === "CAMPAIGN" && (
+            <CampaignSheet
+              artifact={selectedArtifact}
+              onClose={handleSheetClose}
+            />
+          )}
           {selectedArtifact &&
             selectedArtifact.type !== "BRIEF" &&
-            selectedArtifact.type !== "COMPETITION" && (
+            selectedArtifact.type !== "COMPETITION" &&
+            selectedArtifact.type !== "CAMPAIGN" && (
               <>
                 <SheetHeader className="px-6 pt-5 pb-4 border-b border-border">
                   <SheetTitle>{selectedArtifact.title}</SheetTitle>

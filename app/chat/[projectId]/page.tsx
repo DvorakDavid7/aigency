@@ -23,7 +23,7 @@ export default async function ProjectChatPage({
         brief: { select: { id: true } },
         conversations: {
           orderBy: { updatedAt: "desc" },
-          select: { id: true, title: true, updatedAt: true },
+          select: { id: true, type: true, title: true, updatedAt: true },
           take: 30,
         },
       },
@@ -59,6 +59,7 @@ export default async function ProjectChatPage({
         projectId={project.id}
         projectName={project.name}
         conversations={project.conversations}
+        hasBrief={hasBrief}
       />
       <ChatMain
         projectId={project.id}
