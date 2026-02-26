@@ -22,6 +22,7 @@ export default async function ConversationChatPage({
       select: {
         id: true,
         name: true,
+        brief: { select: { id: true } },
         conversations: {
           orderBy: { updatedAt: "desc" },
           select: { id: true, title: true, updatedAt: true },
@@ -68,6 +69,7 @@ export default async function ConversationChatPage({
   }))
 
   const fbConnected = !!facebookConnection?.fbAccountId
+  const hasBrief = !!project.brief
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -80,6 +82,7 @@ export default async function ConversationChatPage({
         projectId={project.id}
         projectName={project.name}
         fbConnected={fbConnected}
+        hasBrief={hasBrief}
         initialMessages={initialMessages}
         conversationId={conversationId}
       />

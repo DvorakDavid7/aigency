@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport, type UIMessage } from "ai"
-import { ArrowUp, Bot, User, Facebook } from "lucide-react"
+import { ArrowUp, Bot, Search, User, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
@@ -12,11 +12,12 @@ type Props = {
   projectId: string
   projectName: string
   fbConnected: boolean
+  hasBrief?: boolean
   conversationId?: string
   initialMessages?: UIMessage[]
 }
 
-export function ChatMain({ projectId, projectName, fbConnected, conversationId, initialMessages }: Props) {
+export function ChatMain({ projectId, projectName, fbConnected, hasBrief, conversationId, initialMessages }: Props) {
   const [input, setInput] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -162,6 +163,21 @@ export function ChatMain({ projectId, projectName, fbConnected, conversationId, 
       {/* Input area */}
       <div className="shrink-0 border-t border-border px-6 py-4">
         <div className="mx-auto max-w-2xl">
+          {/* Quick-action chips (shown when brief exists and not mid-conversation) */}
+          {hasBrief && messages.length === 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              <button
+                onClick={() => {
+                  setInput("Please analyze my competitors — browse the web and create a comprehensive competition analysis artifact.")
+                  textareaRef.current?.focus()
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <Search className="h-3 w-3" />
+                Analyze competitors
+              </button>
+            </div>
+          )}
           <div className="flex items-end gap-2 rounded-xl border border-border bg-muted/40 px-4 py-3 focus-within:border-primary/50 focus-within:bg-background transition-colors">
             <textarea
               ref={textareaRef}

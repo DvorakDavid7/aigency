@@ -28,7 +28,24 @@ import { cn } from "@/lib/utils"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type ArtifactType = "BRIEF" | "AD_COPY" | "CAMPAIGN" | "IMAGE" | "REPORT" | "ACTION"
+export type ArtifactType = "BRIEF" | "AD_COPY" | "CAMPAIGN" | "IMAGE" | "REPORT" | "ACTION" | "COMPETITION"
+
+export type CompetitorInfo = {
+  name: string
+  website?: string
+  description: string
+  strengths: string
+  weaknesses: string
+  adStrategy: string
+}
+
+export type CompetitionContent = {
+  summary: string
+  competitors: CompetitorInfo[]
+  opportunities: string
+  threats: string
+  recommendations: string
+}
 
 export type BriefContent = {
   businessDescription: string
@@ -67,6 +84,7 @@ const TYPE_LABELS: Record<ArtifactType, string> = {
   IMAGE: "Image",
   REPORT: "Report",
   ACTION: "Action",
+  COMPETITION: "Competition Analysis",
 }
 
 // ─── Brief Sheet ──────────────────────────────────────────────────────────────
@@ -264,6 +282,122 @@ function BriefSheet({
   )
 }
 
+// ─── Competition Sheet ────────────────────────────────────────────────────────
+
+function CompetitionSheet({
+  artifact,
+  onClose,
+}: {
+  artifact: ArtifactData
+  onClose: () => void
+}) {
+  const data = artifact.content as CompetitionContent
+
+  return (
+    <>
+      <SheetHeader className="px-6 pt-5 pb-4 border-b border-border">
+        <SheetTitle>{artifact.title}</SheetTitle>
+        <p className="text-xs text-muted-foreground">
+          Last updated {new Date(artifact.updatedAt).toLocaleDateString()}
+        </p>
+      </SheetHeader>
+
+      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6 min-h-0">
+        {/* Summary */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Landscape Summary
+          </p>
+          <p className="text-sm leading-relaxed text-foreground">{data.summary}</p>
+        </div>
+
+        <Separator />
+
+        {/* Competitors */}
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Competitors ({data.competitors?.length ?? 0})
+          </p>
+          <div className="space-y-4">
+            {data.competitors?.map((c, i) => (
+              <div key={i} className="rounded-lg border border-border bg-muted/30 p-4 space-y-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
+                  {c.website && (
+                    <a
+                      href={c.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline shrink-0"
+                    >
+                      Visit site ↗
+                    </a>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">{c.description}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
+                      Strengths
+                    </p>
+                    <p className="text-xs text-foreground leading-relaxed">{c.strengths}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-destructive">
+                      Weaknesses
+                    </p>
+                    <p className="text-xs text-foreground leading-relaxed">{c.weaknesses}</p>
+                  </div>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Ad Strategy
+                  </p>
+                  <p className="text-xs text-foreground leading-relaxed">{c.adStrategy}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Opportunities & Threats */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
+              Opportunities
+            </p>
+            <p className="text-sm leading-relaxed text-foreground">{data.opportunities}</p>
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-destructive">
+              Threats
+            </p>
+            <p className="text-sm leading-relaxed text-foreground">{data.threats}</p>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Recommendations */}
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Ad Strategy Recommendations
+          </p>
+          <p className="text-sm leading-relaxed text-foreground">{data.recommendations}</p>
+        </div>
+      </div>
+
+      <SheetFooter className="px-6 pt-4 pb-5 border-t border-border">
+        <Button variant="outline" onClick={onClose} className="w-full">
+          Close
+        </Button>
+      </SheetFooter>
+    </>
+  )
+}
+
 // ─── Artifact Card ────────────────────────────────────────────────────────────
 
 function ArtifactCard({
@@ -274,6 +408,8 @@ function ArtifactCard({
   onClick: () => void
 }) {
   const brief = artifact.type === "BRIEF" ? (artifact.content as BriefContent) : null
+  const competition =
+    artifact.type === "COMPETITION" ? (artifact.content as CompetitionContent) : null
 
   return (
     <button
@@ -281,7 +417,11 @@ function ArtifactCard({
       className="w-full text-left flex items-start gap-3 rounded-lg border border-border bg-background px-3 py-3 hover:bg-sidebar-accent transition-colors"
     >
       <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
-        <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+        {artifact.type === "COMPETITION" ? (
+          <Search className="h-3.5 w-3.5 text-muted-foreground" />
+        ) : (
+          <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
@@ -301,6 +441,19 @@ function ArtifactCard({
               {GOAL_LABELS[brief.goal] ?? brief.goal} ·{" "}
               ${Math.round(brief.monthlyBudget / 100).toLocaleString()}/mo
             </p>
+          </>
+        )}
+        {competition && (
+          <>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+              {competition.summary}
+            </p>
+            {competition.competitors?.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {competition.competitors.length} competitor
+                {competition.competitors.length !== 1 ? "s" : ""} analyzed
+              </p>
+            )}
           </>
         )}
       </div>
@@ -544,21 +697,29 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
               onSaved={handleSaved}
             />
           )}
-          {selectedArtifact && selectedArtifact.type !== "BRIEF" && (
-            <>
-              <SheetHeader className="px-6 pt-5 pb-4 border-b border-border">
-                <SheetTitle>{selectedArtifact.title}</SheetTitle>
-                <p className="text-xs text-muted-foreground">
-                  {TYPE_LABELS[selectedArtifact.type] ?? selectedArtifact.type}
-                </p>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
-                <pre className="text-xs whitespace-pre-wrap break-all text-muted-foreground">
-                  {JSON.stringify(selectedArtifact.content, null, 2)}
-                </pre>
-              </div>
-            </>
+          {selectedArtifact?.type === "COMPETITION" && (
+            <CompetitionSheet
+              artifact={selectedArtifact}
+              onClose={handleSheetClose}
+            />
           )}
+          {selectedArtifact &&
+            selectedArtifact.type !== "BRIEF" &&
+            selectedArtifact.type !== "COMPETITION" && (
+              <>
+                <SheetHeader className="px-6 pt-5 pb-4 border-b border-border">
+                  <SheetTitle>{selectedArtifact.title}</SheetTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {TYPE_LABELS[selectedArtifact.type] ?? selectedArtifact.type}
+                  </p>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
+                  <pre className="text-xs whitespace-pre-wrap break-all text-muted-foreground">
+                    {JSON.stringify(selectedArtifact.content, null, 2)}
+                  </pre>
+                </div>
+              </>
+            )}
         </SheetContent>
       </Sheet>
     </aside>

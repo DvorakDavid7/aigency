@@ -20,9 +20,47 @@ Ask these questions conversationally — one or two at a time, not all at once:
 When you have confident answers for all required fields, call the saveBrief tool. Do not ask the user to confirm — just save it.
 After saving, tell the user their brief is complete and give a short plain-language summary of what you captured.`
 
-const MARKETING_SYSTEM_PROMPT = `You are an AI marketing agent helping business owners run Facebook ad campaigns.
+const MARKETING_SYSTEM_PROMPT_BASE = `You are an AI marketing agent helping business owners run Facebook ad campaigns.
 You help users create campaigns, write compelling ad copy, analyze performance, and continuously optimize their advertising for better results.
-Be concise, practical, and results-focused. Always explain your reasoning in plain language — no marketing jargon.`
+Be concise, practical, and results-focused. Always explain your reasoning in plain language — no marketing jargon.
+
+When asked to analyze competitors or research the competition:
+1. Use the webSearch tool to search for competitors in the user's market — search broadly and deeply
+2. Search for each competitor's website, Facebook ads, ad strategy, pricing, and positioning
+3. Run multiple searches to gather comprehensive information (e.g. "[product category] competitors [location]", "best [product] companies", "top [industry] brands Facebook ads")
+4. Once you have researched at least 3 competitors, you MUST call saveCompetitionAnalysis to save the artifact — do not ask for permission, just save it
+5. After saving, give the user a concise summary of your key findings and ad strategy recommendations`
+
+type BriefContext = {
+  businessDescription: string
+  product: string
+  targetAudience: string
+  uniqueSellingPoint: string
+  goal: string
+  monthlyBudget: number
+  location: string
+  websiteUrl?: string | null
+}
+
+function buildMarketingSystemPrompt(brief?: BriefContext | null): string {
+  if (!brief) return MARKETING_SYSTEM_PROMPT_BASE
+
+  const lines = [
+    `- Business: ${brief.businessDescription}`,
+    `- Product/Service: ${brief.product}`,
+    `- Target Audience: ${brief.targetAudience}`,
+    `- Unique Selling Point: ${brief.uniqueSellingPoint}`,
+    `- Campaign Goal: ${brief.goal}`,
+    `- Monthly Budget: $${Math.round(brief.monthlyBudget / 100).toLocaleString()}/month`,
+    `- Location: ${brief.location}`,
+    ...(brief.websiteUrl ? [`- Website: ${brief.websiteUrl}`] : []),
+  ]
+
+  return `${MARKETING_SYSTEM_PROMPT_BASE}
+
+## Business Context
+${lines.join("\n")}`
+}
 
 async function persistMessage(conversationId: string, role: string, content: string) {
   await prisma.message.create({
@@ -42,8 +80,8 @@ export async function POST(req: Request) {
     conversationId,
   }: { messages: UIMessage[]; projectId: string; conversationId?: string } = await req.json()
 
-  let systemPrompt = MARKETING_SYSTEM_PROMPT
   let isOnboarding = false
+  let brief: BriefContext | null = null
 
   if (conversationId) {
     const conversation = await prisma.conversation.findFirst({
@@ -53,15 +91,35 @@ export async function POST(req: Request) {
       },
       select: {
         type: true,
-        project: { select: { brief: { select: { id: true } } } },
+        project: {
+          select: {
+            brief: {
+              select: {
+                businessDescription: true,
+                product: true,
+                targetAudience: true,
+                uniqueSellingPoint: true,
+                goal: true,
+                monthlyBudget: true,
+                location: true,
+                websiteUrl: true,
+              },
+            },
+          },
+        },
       },
     })
 
     if (conversation?.type === "ONBOARDING" && !conversation.project.brief) {
-      systemPrompt = ONBOARDING_SYSTEM_PROMPT
       isOnboarding = true
+    } else if (conversation?.project.brief) {
+      brief = conversation.project.brief
     }
   }
+
+  const systemPrompt = isOnboarding
+    ? ONBOARDING_SYSTEM_PROMPT
+    : buildMarketingSystemPrompt(brief)
 
   // Save the incoming user message to DB
   if (conversationId && messages.length > 0) {
@@ -73,6 +131,11 @@ export async function POST(req: Request) {
       if (text) await persistMessage(conversationId, "user", text)
     }
   }
+
+  const capturedConversationId = conversationId
+  const capturedProjectId = projectId
+
+  // ─── Onboarding: saveBrief tool ─────────────────────────────────────────────
 
   const briefInputSchema = z.object({
     businessDescription: z.string().describe("What the business does"),
@@ -96,16 +159,12 @@ export async function POST(req: Request) {
       ),
   })
 
-  const capturedConversationId = conversationId
-  const capturedProjectId = projectId
-
   const saveBriefTool = {
     description:
       "Save the completed business brief to the database once you have gathered all required information from the user.",
     inputSchema: briefInputSchema,
     execute: async (input: z.infer<typeof briefInputSchema>) => {
       const budgetInCents = input.monthlyBudget * 100
-
       let artifactId = ""
 
       await prisma.$transaction(async (tx) => {
@@ -169,21 +228,106 @@ export async function POST(req: Request) {
     },
   }
 
-  const result = streamText({
-    model: anthropic("claude-sonnet-4-6"),
-    system: systemPrompt,
-    messages: await convertToModelMessages(messages),
-    ...(isOnboarding ? { tools: { saveBrief: saveBriefTool }, stopWhen: stepCountIs(3) } : {}),
-    onFinish: async ({ steps }) => {
-      if (conversationId) {
-        const fullText = steps
-          .map((s) => s.text)
-          .filter((t) => t.trim())
-          .join("\n\n")
-        if (fullText) await persistMessage(conversationId, "assistant", fullText)
+  // ─── Marketing: saveCompetitionAnalysis tool ─────────────────────────────────
+
+  const competitionInputSchema = z.object({
+    title: z.string().describe("Title for this competition analysis artifact"),
+    summary: z
+      .string()
+      .describe("Overall competitive landscape summary (2-3 paragraphs)"),
+    competitors: z
+      .array(
+        z.object({
+          name: z.string(),
+          website: z.string().optional(),
+          description: z.string().describe("What this competitor does"),
+          strengths: z.string(),
+          weaknesses: z.string(),
+          adStrategy: z
+            .string()
+            .describe("Their likely Facebook/social ad strategy and positioning"),
+        })
+      )
+      .describe("List of key competitors analyzed (3-6 competitors)"),
+    opportunities: z
+      .string()
+      .describe("Key opportunities for our client based on competitive gaps"),
+    threats: z
+      .string()
+      .describe("Key threats to be aware of from competitors"),
+    recommendations: z
+      .string()
+      .describe(
+        "Specific ad strategy recommendations based on this competitive analysis"
+      ),
+  })
+
+  const saveCompetitionAnalysisTool = {
+    description:
+      "Save the completed competition analysis as an artifact once you have researched all key competitors via web search.",
+    inputSchema: competitionInputSchema,
+    execute: async (input: z.infer<typeof competitionInputSchema>) => {
+      try {
+        const artifact = await prisma.artifact.create({
+          data: {
+            projectId: capturedProjectId,
+            conversationId: capturedConversationId ?? null,
+            type: "COMPETITION",
+            title: input.title || "Competition Analysis",
+            content: {
+              summary: input.summary,
+              competitors: input.competitors,
+              opportunities: input.opportunities,
+              threats: input.threats,
+              recommendations: input.recommendations,
+            },
+          },
+          select: { id: true },
+        })
+
+        console.log("[saveCompetitionAnalysis] artifact created:", artifact.id)
+        return { success: true, artifactId: artifact.id }
+      } catch (err) {
+        console.error("[saveCompetitionAnalysis] failed:", err)
+        return { success: false, error: String(err) }
       }
     },
-  })
+  }
+
+  // ─── Stream ───────────────────────────────────────────────────────────────────
+
+  const convertedMessages = await convertToModelMessages(messages)
+
+  async function handleFinish({ steps }: { steps: Array<{ text: string }> }) {
+    if (conversationId) {
+      const fullText = steps
+        .map((s) => s.text)
+        .filter((t) => t.trim())
+        .join("\n\n")
+      if (fullText) await persistMessage(conversationId, "assistant", fullText)
+    }
+  }
+
+  const result = isOnboarding
+    ? streamText({
+        model: anthropic("claude-sonnet-4-6"),
+        system: systemPrompt,
+        messages: convertedMessages,
+        tools: { saveBrief: saveBriefTool },
+        stopWhen: stepCountIs(3),
+        onFinish: handleFinish,
+      })
+    : streamText({
+        model: anthropic("claude-sonnet-4-6"),
+        system: systemPrompt,
+        messages: convertedMessages,
+        tools: {
+          webSearch: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+          saveCompetitionAnalysis: saveCompetitionAnalysisTool,
+        },
+        stopWhen: stepCountIs(30),
+        onFinish: handleFinish,
+      })
 
   return result.toUIMessageStreamResponse()
 }
