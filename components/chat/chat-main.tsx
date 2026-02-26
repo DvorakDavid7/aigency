@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport, type UIMessage } from "ai"
 import { ArrowUp, Bot, Search, User, Facebook } from "lucide-react"
+import { Markdown } from "@/components/ui/markdown"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
@@ -125,9 +126,13 @@ export function ChatMain({ projectId, projectName, fbConnected, hasBrief, conver
                     : "bg-primary text-primary-foreground rounded-tr-sm"
                 )}
               >
-                {msg.parts
-                  .map((part) => (part.type === "text" ? part.text : ""))
-                  .join("")}
+                {msg.role === "assistant" ? (
+                  <Markdown
+                    content={msg.parts.map((part) => (part.type === "text" ? part.text : "")).join("")}
+                  />
+                ) : (
+                  msg.parts.map((part) => (part.type === "text" ? part.text : "")).join("")
+                )}
               </div>
             </div>
           ))}

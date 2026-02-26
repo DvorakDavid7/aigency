@@ -285,7 +285,6 @@ export async function POST(req: Request) {
           select: { id: true },
         })
 
-        console.log("[saveCompetitionAnalysis] artifact created:", artifact.id)
         return { success: true, artifactId: artifact.id }
       } catch (err) {
         console.error("[saveCompetitionAnalysis] failed:", err)

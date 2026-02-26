@@ -1,21 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import {
-  BarChart2,
-  FileText,
-  Globe,
-  ImageIcon,
-  Megaphone,
-  Search,
-  Sparkles,
-  Target,
-  Zap,
-} from "lucide-react"
+import { FileText, Search, Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Markdown } from "@/components/ui/markdown"
 import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
@@ -303,17 +294,15 @@ function CompetitionSheet({
       </SheetHeader>
 
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6 min-h-0">
-        {/* Summary */}
         <div className="space-y-1.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Landscape Summary
           </p>
-          <p className="text-sm leading-relaxed text-foreground">{data.summary}</p>
+          <Markdown content={data.summary} />
         </div>
 
         <Separator />
 
-        {/* Competitors */}
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Competitors ({data.competitors?.length ?? 0})
@@ -362,30 +351,28 @@ function CompetitionSheet({
 
         <Separator />
 
-        {/* Opportunities & Threats */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-4">
           <div className="space-y-1.5">
             <p className="text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
               Opportunities
             </p>
-            <p className="text-sm leading-relaxed text-foreground">{data.opportunities}</p>
+            <Markdown content={data.opportunities} />
           </div>
           <div className="space-y-1.5">
             <p className="text-xs font-semibold uppercase tracking-wider text-destructive">
               Threats
             </p>
-            <p className="text-sm leading-relaxed text-foreground">{data.threats}</p>
+            <Markdown content={data.threats} />
           </div>
         </div>
 
         <Separator />
 
-        {/* Recommendations */}
         <div className="space-y-1.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Ad Strategy Recommendations
           </p>
-          <p className="text-sm leading-relaxed text-foreground">{data.recommendations}</p>
+          <Markdown content={data.recommendations} />
         </div>
       </div>
 
@@ -461,146 +448,19 @@ function ArtifactCard({
   )
 }
 
-// ─── Fallback: static tools panel (shown when no projectId) ──────────────────
-
-type Tool = {
-  id: string
-  name: string
-  description: string
-  icon: React.ElementType
-  status: "available" | "coming-soon"
-}
-
-const AGENT_TOOLS: Tool[] = [
-  {
-    id: "campaign-creator",
-    name: "Campaign Creator",
-    description: "Generate full Facebook ad campaigns from a brief",
-    icon: Megaphone,
-    status: "available",
-  },
-  {
-    id: "ad-copy",
-    name: "Ad Copy Generator",
-    description: "Write headlines, primary text, and CTAs",
-    icon: FileText,
-    status: "available",
-  },
-  {
-    id: "audience-research",
-    name: "Audience Research",
-    description: "Identify interest-based and lookalike audiences",
-    icon: Target,
-    status: "available",
-  },
-  {
-    id: "performance-analysis",
-    name: "Performance Analysis",
-    description: "Analyze ROAS, CTR, CPA and surface insights",
-    icon: BarChart2,
-    status: "available",
-  },
-  {
-    id: "image-generator",
-    name: "Image Generator",
-    description: "Generate ad creatives and banners",
-    icon: ImageIcon,
-    status: "coming-soon",
-  },
-  {
-    id: "competitor-research",
-    name: "Competitor Research",
-    description: "Analyze competitor ad strategies",
-    icon: Search,
-    status: "coming-soon",
-  },
-  {
-    id: "ab-testing",
-    name: "A/B Testing",
-    description: "Set up and monitor split tests automatically",
-    icon: Zap,
-    status: "available",
-  },
-  {
-    id: "web-search",
-    name: "Web Search",
-    description: "Search the web for market trends and data",
-    icon: Globe,
-    status: "available",
-  },
-]
-
-function StaticAgentToolsPanel() {
-  return (
-    <aside className="flex w-72 shrink-0 flex-col border-l border-border bg-sidebar">
-      <div className="flex h-14 items-center gap-2 px-4 border-b border-border">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <span className="font-semibold text-sm text-sidebar-foreground">Agent Tools</span>
-      </div>
-      <div className="flex-1 overflow-y-auto px-3 py-3 min-h-0">
-        <p className="px-1 mb-3 text-xs text-muted-foreground">
-          Tools available to the current agent
-        </p>
-        <div className="space-y-1">
-          {AGENT_TOOLS.map((tool, i) => (
-            <div key={tool.id}>
-              <div className="flex items-start gap-3 rounded-lg px-2 py-2.5 hover:bg-sidebar-accent transition-colors cursor-default">
-                <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <tool.icon className="h-3.5 w-3.5 text-muted-foreground" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-medium text-sidebar-foreground leading-tight">
-                      {tool.name}
-                    </p>
-                    {tool.status === "coming-soon" && (
-                      <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
-                        Soon
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
-                    {tool.description}
-                  </p>
-                </div>
-              </div>
-              {i < AGENT_TOOLS.length - 1 && (
-                <Separator className="mx-2 my-0.5 opacity-50" />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="shrink-0 border-t border-border px-4 py-3">
-        <p className="text-xs text-muted-foreground">
-          <span className="text-foreground font-medium">
-            {AGENT_TOOLS.filter((t) => t.status === "available").length}
-          </span>{" "}
-          tools active ·{" "}
-          <span className="text-foreground font-medium">
-            {AGENT_TOOLS.filter((t) => t.status === "coming-soon").length}
-          </span>{" "}
-          coming soon
-        </p>
-      </div>
-    </aside>
-  )
-}
-
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 type Props = {
-  projectId?: string
+  projectId: string
   initialArtifacts?: ArtifactData[]
 }
 
-export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
+export function ChatRightPanel({ projectId, initialArtifacts }: Props) {
   const [artifacts, setArtifacts] = useState<ArtifactData[]>(initialArtifacts ?? [])
   const [selectedArtifact, setSelectedArtifact] = useState<ArtifactData | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
 
   const fetchArtifacts = useCallback(async () => {
-    if (!projectId) return
     try {
       const res = await fetch(`/api/projects/${projectId}/artifacts`)
       if (!res.ok) return
@@ -611,11 +471,10 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
   }, [projectId])
 
   useEffect(() => {
-    if (!projectId) return
     const handler = () => fetchArtifacts()
     window.addEventListener("aigency:artifact-updated", handler)
     return () => window.removeEventListener("aigency:artifact-updated", handler)
-  }, [projectId, fetchArtifacts])
+  }, [fetchArtifacts])
 
   function handleCardClick(artifact: ArtifactData) {
     setSelectedArtifact(artifact)
@@ -624,23 +483,16 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
 
   function handleSheetClose() {
     setSheetOpen(false)
-    setTimeout(() => setSelectedArtifact(null), 350) // wait for close animation
+    setTimeout(() => setSelectedArtifact(null), 350)
   }
 
   function handleSaved() {
-    // Re-fetch to get updated artifact content, then close
     fetchArtifacts()
     handleSheetClose()
   }
 
-  // When there's no projectId, show the original static tools panel
-  if (!projectId) {
-    return <StaticAgentToolsPanel />
-  }
-
   return (
     <aside className="flex w-72 shrink-0 flex-col border-l border-border bg-sidebar">
-      {/* Header */}
       <div className="flex h-14 items-center gap-2 px-4 border-b border-border">
         <FileText className="h-4 w-4 text-primary" />
         <span className="font-semibold text-sm text-sidebar-foreground">Artifacts</span>
@@ -651,7 +503,6 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
         )}
       </div>
 
-      {/* List */}
       <div className="flex-1 overflow-y-auto px-3 py-3 min-h-0">
         {artifacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12 gap-3">
@@ -678,7 +529,6 @@ export function ChatRightPanel({ projectId, initialArtifacts }: Props = {}) {
         )}
       </div>
 
-      {/* Detail Sheet */}
       <Sheet
         open={sheetOpen}
         onOpenChange={(open) => {
