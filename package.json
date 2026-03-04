@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.47",
+    "@ai-sdk/fal": "^2.0.23",
+    "@ai-sdk/openai": "^3.0.39",
     "@ai-sdk/react": "^3.0.101",
     "@better-auth/stripe": "^1.4.19",
     "@hookform/resolvers": "^5.2.2",
